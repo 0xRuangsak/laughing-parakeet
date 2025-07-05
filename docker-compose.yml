@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  alpine-blockchain:
+    build: .
+    container_name: alpine-blockchain
+    ports:
+      - "2222:22"      # SSH access
+    environment:
+      - TERM=xterm
+    restart: unless-stopped
+    tty: true
