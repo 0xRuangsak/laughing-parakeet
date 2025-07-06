@@ -75,13 +75,36 @@ blockchain-container/
 - Avoids direct file creation in container
 - Maintains clean container environment with each restart
 
-#### Current Status: GENESIS CONFIGURATION CREATED
+### 2025-07-06: Blockchain Initialization and Experimental Testing
+
+#### Geth Version Compatibility Issues
+- **Geth 1.15.11**: Failed - only supports PoS networks post-merge
+- **Geth 1.13.15**: Failed - ethash PoW no longer supported
+- **Geth 1.10.26**: Success - pre-merge version with full PoW support
+
+#### Zero Address Faucet Experiment
+- **Hypothesis**: Genesis-allocated zero address could function as faucet
+- **Test Results**: 
+  - ✅ Funds allocated successfully (1M ETH at zero address)
+  - ❌ Cannot unlock zero address ("no key for given address or file")
+  - ❌ Cannot send transactions ("unknown account")
+- **Conclusion**: Genesis allocation ≠ spendable account without private key
+
+#### Technical Learnings
+- Modern Geth versions only support PoS (post-merge)
+- Genesis allocation creates balance but not spendable account
+- Account management requires proper private keys even for genesis funds
+- Geth 1.10.26 is latest version supporting PoW mining
+
+#### Current Status: READY FOR PROPER FAUCET IMPLEMENTATION
 - Container setup ✅
 - SSH access ✅  
 - Workspace mount ✅
-- Geth installed and working ✅
-- **NEW**: Genesis.json created with experimental zero address funding ✅
-- Next: Save genesis.json to workspace, restart container, initialize blockchain
+- Geth 1.10.26 installed and working ✅
+- Blockchain initialized ✅
+- PoW manual mining confirmed working ✅
+- Zero address experiment completed (failed as expected) ✅
+- Next: Create proper faucet with known private key
 
 ## Accomplishments
 

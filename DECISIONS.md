@@ -79,14 +79,23 @@ This document records key decisions made during project development, including r
 - Full host volume mount for all data
 **Impact**: Development files edited on Mac in `./workspace`, mounted to `/workspace` in container
 
-### D012: File-First Development Workflow (2025-07-06)
-**Decision**: Create files on Mac first, then restart container to use them
-**Rationale**: User prefers editing files outside container, then restarting for clean environment
+### D013: Zero Address Faucet Experiment (2025-07-06)
+**Decision**: Zero address funding approach does not work for faucet functionality
+**Rationale**: Experimental testing proved that genesis-allocated funds at zero address cannot be transferred
 **Alternatives Considered**: 
-- Create files directly in container via SSH
-- Edit files in container then sync to host
-- Live editing with hot-reload
-**Impact**: Development files created on Mac in workspace, container restarted to pick up changes
+- Zero address with genesis allocation (tested - failed)
+- Proper test address with known private key
+- Smart contract faucet
+**Impact**: Must use proper address with private key for faucet functionality
+
+### D014: Geth Version Compatibility (2025-07-06)
+**Decision**: Use Geth 1.10.26 for Proof of Work support
+**Rationale**: Modern Geth versions (1.13+) only support PoS post-merge networks
+**Alternatives Considered**: 
+- Geth 1.15.11 (failed - PoS only)
+- Geth 1.13.15 (failed - PoS only)
+- Geth 1.10.26 (success - pre-merge PoW support)
+**Impact**: Must use older Geth version to maintain PoW + manual mining workflow
 
 ## User Preferences Established
 
