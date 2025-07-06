@@ -6,6 +6,8 @@ services:
     container_name: alpine-blockchain
     ports:
       - "2222:22"      # SSH access
+    volumes:
+      - ./workspace:/workspace
     environment:
       - TERM=xterm
     restart: unless-stopped

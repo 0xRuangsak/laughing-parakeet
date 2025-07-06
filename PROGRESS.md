@@ -33,10 +33,43 @@ This document tracks the chronological development of the blockchain container p
 4. **DECISIONS.md**: Architecture decisions and rationale
 5. **PROGRESS.md**: This timeline document
 
-#### Current Status: READY FOR TESTING
+### 2025-07-05: Workflow Enhancement
+
+#### Performance Issue Identified
+- User tested VSCode SSH plugin and found container SSH very slow
+- **Solution**: Mount workspace folder for development files
+
+#### Workflow Change
+- **Before**: All files edited inside container via SSH
+- **After**: Development files edited on Mac in `workspace/` folder, mounted to `/workspace` in container
+- **Benefits**: Fast editing on Mac, automatic sync to container
+
+#### Updated Structure
+```
+blockchain-container/
+├── Dockerfile
+├── docker-compose.yml
+├── README.md
+├── DECISIONS.md
+├── PROGRESS.md  
+├── QUICKSTART.md
+└── workspace/          <- NEW: Development files (empty start)
+```
+
+#### File Strategy Clarified
+- **Workspace (`./workspace` → `/workspace`)**: Files for development/editing (contracts, scripts, configs)
+- **Container**: Blockchain data, geth installation, read-only/minimal-edit files
+- **Geth**: Remains installed in container (ephemeral)
+
+#### Updated Setup Process
+1. Create workspace folder: `mkdir workspace`
+2. Build and start: `docker compose build && docker compose up`
+3. SSH access: `ssh root@localhost -p 2222`
+4. Development files accessible at `/workspace` in container
 - All configuration files created
-- Documentation complete with LLM context
-- User can proceed with: `docker compose build && docker compose up`
+- Documentation complete with LLM context  
+- **NEW**: Added workspace folder mount for development files
+- User can proceed with: `mkdir workspace && docker compose build && docker compose up`
 
 ## Accomplishments
 
