@@ -38,11 +38,13 @@ This approach avoids assumptions and gives complete control over the environment
 ```
 blockchain-container/
 ├── Dockerfile          (Alpine + SSH configuration)
-├── docker-compose.yml  (Container orchestration)
+├── docker-compose.yml  (Container orchestration + workspace mount)
 ├── README.md           (This file - comprehensive documentation)
 ├── DECISIONS.md        (Architecture decisions and rationale)
 ├── PROGRESS.md         (Project timeline and status)
-└── QUICKSTART.md       (Essential commands only)
+├── QUICKSTART.md       (Essential commands only)
+└── workspace/          (Development files - edit on Mac, sync to container)
+    └── .gitkeep        (Keeps empty folder in git)
 ```
 
 **Note**: DECISIONS.md and PROGRESS.md contain critical context for future LLM conversations.
@@ -53,16 +55,21 @@ mkdir blockchain-container
 cd blockchain-container
 ```
 
-2. **Save the Dockerfile and docker-compose.yml** from the artifacts above
+2. **Create workspace folder:**
+```bash
+mkdir workspace
+```
 
-3. **Build and start container:**
+3. **Save the Dockerfile and docker-compose.yml** from the artifacts above
+
+4. **Build and start container:**
 ```bash
 docker compose build
 docker compose up
 ```
 (Keep this terminal open - container runs in foreground)
 
-4. **Open new terminal and SSH into container:**
+5. **Open new terminal and SSH into container:**
 ```bash
 ssh root@localhost -p 2222
 ```
@@ -77,13 +84,17 @@ You now have a clean Alpine Linux environment ready for your blockchain experime
 - SSH server configured for root access (no password)
 - Basic tools: curl, wget, vim, nano
 - Working directory: `/blockchain`
+- Workspace directory: `/workspace` (mounted from your Mac's `./workspace` folder)
 
 **What's NOT included (install as needed):**
 - Geth (install manually)
 - Smart contract development tools
 - Additional development packages
 
-From here, you can install geth and set up your blockchain exactly as you prefer.
+**Development Workflow:**
+- Edit files on your Mac in the `workspace/` folder (fast)
+- Files automatically appear in `/workspace` inside the container
+- Use container for running geth and blockchain commands
 
 ### Why Manual Block Creation?
 Manual block creation is perfect for blockchain experimentation because:

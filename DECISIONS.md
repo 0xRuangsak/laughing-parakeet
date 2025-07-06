@@ -70,6 +70,15 @@ This document records key decisions made during project development, including r
 **Alternatives Considered**: Single project log file, everything in README
 **Impact**: Better organization of decisions vs timeline, easier for LLMs to understand context
 
+### D011: Development Workflow Enhancement (2025-07-05)
+**Decision**: Add workspace folder mount for development files
+**Rationale**: SSH editing in container was very slow, needed fast development workflow
+**Alternatives Considered**: 
+- Continue with slow SSH editing
+- Use docker exec instead of SSH
+- Full host volume mount for all data
+**Impact**: Development files edited on Mac in `./workspace`, mounted to `/workspace` in container
+
 ## User Preferences Established
 
 ### Technical Preferences
@@ -77,7 +86,7 @@ This document records key decisions made during project development, including r
 - Alpine Linux for minimal size
 - Manual installation philosophy for learning
 - Root access without authentication complexity
-- Container-native approach (no host mounts)
+- Hybrid approach: workspace mount for dev files, container storage for blockchain data
 
 ### Workflow Preferences  
 - Foreground container operation (no background daemon)
@@ -85,6 +94,7 @@ This document records key decisions made during project development, including r
 - Manual block creation for precise control
 - Install-as-needed for development tools
 - Simple over complex solutions
+- Fast editing on host, execution in container
 
 ### Learning Philosophy
 - Hands-on manual configuration over automation
@@ -98,9 +108,10 @@ This document records key decisions made during project development, including r
 - **Ubuntu/Debian base**: Too large for user's preference
 - **Background container (-d flag)**: User prefers foreground + new terminal workflow
 - **Pre-installed geth**: User wants manual installation for learning
-- **Host volume mounts**: User prioritized simplicity over persistence
+- **Full host volume mounts**: User prioritized simplicity, only workspace needed for dev files
 - **Password/key SSH**: User wanted no authentication complexity
 - **Automatic mining**: User needs manual control for smart contract testing
 - **Pre-exposed ports**: User prefers minimal start, expand as needed
 - **Docker exec access**: User specifically requested SSH capability
 - **Single documentation file**: User agreed separate files better for organization
+- **All-container editing**: Too slow for development workflow
