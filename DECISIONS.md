@@ -79,6 +79,15 @@ This document records key decisions made during project development, including r
 - Full host volume mount for all data
 **Impact**: Development files edited on Mac in `./workspace`, mounted to `/workspace` in container
 
+### D012: File-First Development Workflow (2025-07-06)
+**Decision**: Create files on Mac first, then restart container to use them
+**Rationale**: User prefers editing files outside container, then restarting for clean environment
+**Alternatives Considered**: 
+- Create files directly in container via SSH
+- Edit files in container then sync to host
+- Live editing with hot-reload
+**Impact**: Development files created on Mac in workspace, container restarted to pick up changes
+
 ## User Preferences Established
 
 ### Technical Preferences
@@ -95,6 +104,7 @@ This document records key decisions made during project development, including r
 - Install-as-needed for development tools
 - Simple over complex solutions
 - Fast editing on host, execution in container
+- **File-first workflow**: Create files on Mac → restart container → SSH to use files
 
 ### Learning Philosophy
 - Hands-on manual configuration over automation

@@ -61,15 +61,26 @@ blockchain-container/
 - **Container**: Blockchain data, geth installation, read-only/minimal-edit files
 - **Geth**: Remains installed in container (ephemeral)
 
-#### Updated Setup Process
-1. Create workspace folder: `mkdir workspace`
-2. Build and start: `docker compose build && docker compose up`
-3. SSH access: `ssh root@localhost -p 2222`
-4. Development files accessible at `/workspace` in container
-- All configuration files created
-- Documentation complete with LLM context  
-- **NEW**: Added workspace folder mount for development files
-- User can proceed with: `mkdir workspace && docker compose build && docker compose up`
+### 2025-07-06: Geth Installation and Workflow Refinement
+
+#### Geth Installation Success
+- Encountered glibc compatibility issue on Alpine Linux
+- **Solution**: Installed `gcompat` package for glibc compatibility
+- Geth 1.15.11-stable now working on ARM64 architecture
+- Container ready for blockchain initialization
+
+#### Workflow Preference Clarification
+- **User preference**: File-first workflow
+- Create files on Mac in workspace → restart container → SSH to use files
+- Avoids direct file creation in container
+- Maintains clean container environment with each restart
+
+#### Current Status: READY FOR BLOCKCHAIN CREATION
+- Container setup ✅
+- SSH access ✅  
+- Workspace mount ✅
+- Geth installed and working ✅
+- Next: Create genesis.json on Mac, restart container, initialize blockchain
 
 ## Accomplishments
 
