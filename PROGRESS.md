@@ -75,12 +75,13 @@ blockchain-container/
 - Avoids direct file creation in container
 - Maintains clean container environment with each restart
 
-#### Current Status: READY FOR BLOCKCHAIN CREATION
+#### Current Status: GENESIS CONFIGURATION CREATED
 - Container setup ✅
 - SSH access ✅  
 - Workspace mount ✅
 - Geth installed and working ✅
-- Next: Create genesis.json on Mac, restart container, initialize blockchain
+- **NEW**: Genesis.json created with experimental zero address funding ✅
+- Next: Save genesis.json to workspace, restart container, initialize blockchain
 
 ## Accomplishments
 
