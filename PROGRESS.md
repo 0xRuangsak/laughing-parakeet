@@ -96,15 +96,43 @@ blockchain-container/
 - Account management requires proper private keys even for genesis funds
 - Geth 1.10.26 is latest version supporting PoW mining
 
-#### Current Status: READY FOR PROPER FAUCET IMPLEMENTATION
-- Container setup ✅
-- SSH access ✅  
-- Workspace mount ✅
-- Geth 1.10.26 installed and working ✅
-- Blockchain initialized ✅
-- PoW manual mining confirmed working ✅
-- Zero address experiment completed (failed as expected) ✅
-- Next: Create proper faucet with known private key
+### 2025-07-06: Smart Contract Faucet Design
+
+#### Faucet Architecture Decision
+- **Approach Selected**: Smart contract faucet over genesis pre-funded address
+- **Rationale**: Better learning experience for smart contract development
+- **Design Requirements**: 
+  - Unlimited withdrawal function for private blockchain
+  - No rate limiting or cooldowns needed
+  - Genesis allocation directly to contract address
+  - Contract refillable via ETH transfers
+
+#### Development Toolchain Selection
+- **Solidity Compilation**: In-container using solc package
+- **Workflow Integration**: Aligns with file-first development approach
+- **File Structure Planning**:
+  ```
+  workspace/
+  ├── contracts/
+  │   └── Faucet.sol
+  ├── scripts/
+  │   └── deploy.js
+  └── abi/
+      └── Faucet.json
+  ```
+
+#### Contract Features Defined
+- `gimmeETH(uint256 amount)` - unlimited withdrawal function
+- `receive()` - accept ETH deposits for refilling
+- No access controls (private network, single user)
+- Focus on deployment and interaction learning
+
+#### Current Status: SMART CONTRACT DESIGN DOCUMENTED
+- Architecture decisions recorded ✅
+- Toolchain approach selected ✅
+- Contract features defined ✅
+- File structure planned ✅
+- Next: Implement Faucet.sol contract and deployment workflow
 
 ## Accomplishments
 

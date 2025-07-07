@@ -103,10 +103,17 @@ Must use Geth 1.10.26 or earlier for PoW functionality. This affects:
 
 ## Future Experiment Ideas
 
-### Proper Faucet Implementation
-- Test well-known private keys for development
-- Compare different account creation methods
-- Measure transaction speeds with manual mining
+### Smart Contract Faucet Design
+- Design unlimited withdrawal function for private blockchain
+- Test solidity compilation workflow in container
+- Compare contract deployment vs genesis allocation approaches
+- Document gas costs and deployment process with manual mining
+
+### DeFi Protocol Integration
+- Deploy simple ERC20 tokens for testing
+- Experiment with Uniswap V2 core contracts
+- Test lending protocol basics (Compound-style)
+- Analyze gas optimization in manual mining environment
 
 ### Multi-node Networking
 - Container-to-container P2P connections

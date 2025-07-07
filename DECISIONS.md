@@ -88,14 +88,32 @@ This document records key decisions made during project development, including r
 - Smart contract faucet
 **Impact**: Must use proper address with private key for faucet functionality
 
-### D014: Geth Version Compatibility (2025-07-06)
-**Decision**: Use Geth 1.10.26 for Proof of Work support
-**Rationale**: Modern Geth versions (1.13+) only support PoS post-merge networks
+### D015: Smart Contract Faucet Architecture (2025-07-06)
+**Decision**: Implement smart contract faucet with unlimited function for private blockchain
+**Rationale**: User wants to learn smart contract development and deployment workflow
 **Alternatives Considered**: 
-- Geth 1.15.11 (failed - PoS only)
-- Geth 1.13.15 (failed - PoS only)
-- Geth 1.10.26 (success - pre-merge PoW support)
-**Impact**: Must use older Geth version to maintain PoW + manual mining workflow
+- Genesis pre-funded address (too simple for learning goals)
+- Remix IDE integration (external dependency)
+- Hybrid approach (unnecessary complexity)
+**Impact**: Requires Solidity compilation in container, contract deployment process, ABI handling
+
+### D016: Solidity Development Toolchain (2025-07-06)
+**Decision**: Use in-container Solidity compiler (Option A) over Remix IDE
+**Rationale**: Aligns with file-first workflow, complete control, no external dependencies
+**Alternatives Considered**: 
+- Remix IDE (external tool, not fitting file-first workflow)
+- Hybrid approach (compile in Remix, deploy in container)
+**Impact**: Must install solc in container, manual ABI generation, complete compilation process learning
+
+### D017: Faucet Contract Design (2025-07-06)
+**Decision**: Unlimited faucet with custom amount function for private blockchain experimentation
+**Rationale**: Private network allows unrestricted access, focus on learning over rate limiting
+**Features Decided**:
+- Custom amount withdrawal function: `gimmeETH(uint256 amount)`
+- No cooldowns, no limits, no tracking (private network)
+- Contract refillable via direct ETH transfers
+- Genesis allocation directly to contract address
+**Impact**: Simple contract structure, focus on deployment/interaction learning
 
 ## User Preferences Established
 
