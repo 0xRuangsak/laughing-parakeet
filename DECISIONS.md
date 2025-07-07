@@ -158,31 +158,50 @@ This document records key decisions made during project development, including r
 - Apply to ALL file types: .md, .sol, .json, .sh, .yml, etc.
 **Impact**: Future LLMs must always provide complete files, never partial updates, for user's Mac workflow
 
+### D020: Pre-install Essential Blockchain Tools (2025-07-06)
+**Decision**: Install Geth, Solidity compiler, and gcompat in Dockerfile instead of manual SSH installation
+**Rationale**: These are foundational infrastructure tools, not experimental components
+**Problem with Previous Approach**: 
+- Geth installation is required infrastructure, not learning exercise
+- SSH sessions spent on tool installation rather than blockchain experimentation
+- Downloads and setup time detracted from learning focus
+**Solution Applied**:
+- Pre-install in Dockerfile: Geth 1.10.26, Solidity compiler, gcompat package
+- SSH sessions focus on: blockchain initialization, contract deployment, experimentation
+- Instant availability of all required tools
+**Alternatives Considered**: 
+- Keep manual installation (rejected - infrastructure not experiment)
+- Install all development tools (rejected - still want some manual control)
+**Impact**: Container build time increased but SSH sessions focused purely on blockchain learning
+
 ## User Preferences Established
 
 ### Technical Preferences
 - Mac platform with Docker Compose V2 only
 - Alpine Linux for minimal size
-- Manual installation philosophy for learning
+- Manual installation philosophy for learning (experimental tools only)
 - Root access without authentication complexity
 - Hybrid approach: workspace mount for dev files, container storage for blockchain data
+- Pre-installed infrastructure tools (Geth, Solidity, gcompat)
 
 ### Workflow Preferences  
 - Foreground container operation (no background daemon)
 - SSH access from separate terminals
 - Manual block creation for precise control
-- Install-as-needed for development tools
+- Install-as-needed for experimental/advanced tools only
 - Simple over complex solutions
 - Fast editing on host, execution in container
 - **File-first workflow**: Create files on Mac → restart container → SSH to use files
 - **Complete file updates**: Must see entire file content, not partial updates
+- **Infrastructure pre-installed**: Core tools available immediately
 
 ### Learning Philosophy
-- Hands-on manual configuration over automation
+- Hands-on manual configuration for experimental aspects
 - Understanding each step rather than black-box solutions
 - Experimentation and iteration over production-ready setup
 - Educational value prioritized over convenience
 - Simpler designs preferred over complex convenience features
+- Infrastructure tools pre-installed, experimental workflow manual
 
 ### Communication Preferences
 - Complete file visibility when making updates
@@ -195,7 +214,7 @@ This document records key decisions made during project development, including r
 ### What Was NOT Chosen and Why
 - **Ubuntu/Debian base**: Too large for user's preference
 - **Background container (-d flag)**: User prefers foreground + new terminal workflow
-- **Pre-installed geth**: User wants manual installation for learning
+- **Pre-installed geth**: User wants manual installation for learning (REVERSED in D020)
 - **Full host volume mounts**: User prioritized simplicity, only workspace needed for dev files
 - **Password/key SSH**: User wanted no authentication complexity
 - **Automatic mining**: User needs manual control for smart contract testing
@@ -208,3 +227,4 @@ This document records key decisions made during project development, including r
 - **Remix IDE compilation**: External dependency not fitting file-first workflow
 - **Complex convenience functions**: Compilation issues with decimal literals, simpler is better
 - **Partial file updates**: User requires complete file visibility with filenames
+- **Manual tool installation**: Changed to pre-install for infrastructure tools (D020)
