@@ -1,3 +1,7 @@
+# Multi-stage build: Get solc from official Docker image
+FROM ethereum/solc:stable AS solc-builder
+
+# Main Alpine image
 FROM alpine:latest
 
 # Install SSH, basic tools, and blockchain development dependencies
@@ -8,6 +12,9 @@ RUN apk add --no-cache \
     vim \
     nano \
     gcompat
+
+# Copy solc binary from official Docker image
+COPY --from=solc-builder /usr/bin/solc /usr/local/bin/solc
 
 # Set up SSH
 RUN ssh-keygen -A
@@ -22,13 +29,6 @@ RUN cd /tmp && \
     tar -xzf geth-linux-arm64-1.10.26-e5eb32ac.tar.gz && \
     mv geth-linux-arm64-1.10.26-e5eb32ac/geth /usr/local/bin/ && \
     chmod +x /usr/local/bin/geth && \
-    rm -rf /tmp/*
-
-# Download and install Solidity compiler (ARM64 version)
-RUN cd /tmp && \
-    wget https://github.com/ethereum/solidity/releases/download/v0.8.19/solc-linux-arm64 && \
-    mv solc-linux-arm64 /usr/local/bin/solc && \
-    chmod +x /usr/local/bin/solc && \
     rm -rf /tmp/*
 
 # Verify installations
