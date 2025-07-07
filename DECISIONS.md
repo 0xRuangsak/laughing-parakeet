@@ -145,6 +145,19 @@ This document records key decisions made during project development, including r
 - Cleaner, more maintainable contract structure
 **Impact**: Simpler compilation, easier debugging, web3-based user experience
 
+### D019: File Update Protocol for Future LLMs (2025-07-06)
+**Decision**: Mandatory requirement for future LLMs to provide complete files with filenames when making updates
+**Rationale**: User explicitly required complete file visibility for proper workflow on Mac system
+**Problem Encountered**: 
+- LLM was using partial update syntax (artifacts.update with old_str/new_str)
+- User could not see complete context or save files properly
+- User stated: "when you need to update, you have to give me full file with with file name not like this!!!!!"
+**Solution Applied**:
+- MANDATORY: Always use complete file content with filename header
+- Format: artifacts.create(title="FILENAME.ext - Complete Updated File", content="[ENTIRE FILE]")
+- Apply to ALL file types: .md, .sol, .json, .sh, .yml, etc.
+**Impact**: Future LLMs must always provide complete files, never partial updates, for user's Mac workflow
+
 ## User Preferences Established
 
 ### Technical Preferences
@@ -162,6 +175,7 @@ This document records key decisions made during project development, including r
 - Simple over complex solutions
 - Fast editing on host, execution in container
 - **File-first workflow**: Create files on Mac → restart container → SSH to use files
+- **Complete file updates**: Must see entire file content, not partial updates
 
 ### Learning Philosophy
 - Hands-on manual configuration over automation
@@ -169,6 +183,12 @@ This document records key decisions made during project development, including r
 - Experimentation and iteration over production-ready setup
 - Educational value prioritized over convenience
 - Simpler designs preferred over complex convenience features
+
+### Communication Preferences
+- Complete file visibility when making updates
+- Explicit filename headers for all file changes
+- No partial updates or diff-style changes
+- Full context required for proper Mac workflow
 
 ## Rejected Alternatives
 
@@ -187,3 +207,4 @@ This document records key decisions made during project development, including r
 - **Modern Geth versions**: Don't support PoW mining needed for manual control
 - **Remix IDE compilation**: External dependency not fitting file-first workflow
 - **Complex convenience functions**: Compilation issues with decimal literals, simpler is better
+- **Partial file updates**: User requires complete file visibility with filenames
