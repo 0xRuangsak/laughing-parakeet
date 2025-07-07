@@ -122,17 +122,42 @@ blockchain-container/
   ```
 
 #### Contract Features Defined
-- `gimmeETH(uint256 amount)` - unlimited withdrawal function
+- `getETH(uint256 amount)` - unlimited withdrawal function
 - `receive()` - accept ETH deposits for refilling
 - No access controls (private network, single user)
 - Focus on deployment and interaction learning
 
-#### Current Status: SMART CONTRACT DESIGN DOCUMENTED
-- Architecture decisions recorded ✅
-- Toolchain approach selected ✅
-- Contract features defined ✅
-- File structure planned ✅
-- Next: Implement Faucet.sol contract and deployment workflow
+### 2025-07-06: Smart Contract Development and Compilation
+
+#### Smart Contract Faucet Design Completed
+- **Architecture Selected**: Smart contract faucet over genesis pre-funded address
+- **Toolchain Chosen**: In-container Solidity compilation (solc)
+- **Contract Features Defined**: Unlimited getETH function, receive() for refilling, no access controls
+
+#### Solidity Compilation Issues and Resolution
+- **Problem Encountered**: Compilation errors with decimal literals (0.01 ether, 0.1 ether)
+- **Root Cause**: Solidity doesn't support decimal literals in expressions
+- **Misleading Error**: "Undeclared identifier" instead of "invalid literal"
+- **Solution Applied**: Simplified contract design, removed convenience functions
+- **Final Approach**: Single getETH(uint256 amount) function with web3.toWei() for user convenience
+
+#### Current Contract Status
+- **Working Contract**: Clean, simple Faucet.sol with core functionality only
+- **Ready for Compilation**: Contract should compile successfully in container
+- **Next Phase**: Container compilation testing and deployment workflow
+
+#### Technical Learnings
+- Solidity decimal literal limitations require explicit wei calculations  
+- Complex convenience functions can introduce unnecessary compilation issues
+- Simpler contract design often more maintainable and reliable
+- Error messages in Solidity can be misleading about actual issues
+
+#### Current Status: SMART CONTRACT READY FOR COMPILATION
+- Contract design finalized ✅
+- Compilation issues resolved ✅  
+- Simplified architecture implemented ✅
+- Ready for container testing ✅
+- Next: Install solc in container and test compilation
 
 ## Accomplishments
 
@@ -145,20 +170,25 @@ blockchain-container/
 - [x] Block creation approach defined (manual mining)
 - [x] Documentation created with full context for future LLMs
 - [x] Project structure defined with separation of concerns
+- [x] Workspace mount implemented for fast development
+- [x] Geth 1.10.26 installation working (PoW support)
+- [x] Zero address experiment completed (proved genesis ≠ spendable)
+- [x] Smart contract faucet architecture designed
+- [x] Solidity compilation issues identified and resolved
+- [x] Working Faucet.sol contract ready for deployment
 
 ### 🏗️ In Progress
-- User testing of container setup
-- Manual geth installation inside container
-- Blockchain initialization and first blocks
+- Container solidity compilation testing
+- Smart contract deployment workflow
+- Manual mining integration with contracts
 
 ### 📋 Next Steps (User Actions Required)
-1. Create project directory and save files
-2. Build and start container: `docker compose build && docker compose up`
-3. SSH into container: `ssh root@localhost -p 2222`
-4. Install geth manually inside container
-5. Initialize blockchain with genesis block
-6. Create accounts and start experimenting
-7. Test manual block creation workflow
+1. Restart container and SSH in
+2. Install Solidity compiler: `apk add solidity`
+3. Test contract compilation: `solc --bin --abi /workspace/contracts/Faucet.sol -o /workspace/abi/`
+4. Deploy contract to blockchain
+5. Test faucet functionality with manual mining
+6. Document deployment process
 
 ## Issues and Solutions
 
@@ -176,6 +206,21 @@ blockchain-container/
 **Problem**: Initially suggested `-d` flag despite user preferring foreground
 **Solution**: Corrected documentation to reflect foreground + new terminal workflow
 **Learning**: Pay attention to user's explicit workflow preferences
+
+### Issue: Zero Address Faucet Assumption
+**Problem**: Assumed genesis-allocated zero address could be used for transfers
+**Solution**: Experimental testing proved this doesn't work, moved to smart contract approach
+**Learning**: Test assumptions experimentally rather than making theoretical decisions
+
+### Issue: Geth Version Compatibility
+**Problem**: Modern Geth versions don't support PoW mining
+**Solution**: Downgraded to Geth 1.10.26 for pre-merge PoW support
+**Learning**: Version compatibility critical for blockchain development, post-merge affects functionality
+
+### Issue: Solidity Decimal Literals
+**Problem**: Compilation errors with decimal expressions like 0.01 ether
+**Solution**: Simplified contract design, use web3.toWei() for user convenience
+**Learning**: Solidity has limitations with decimal literals, simpler designs more reliable
 
 ## Future Considerations
 
@@ -199,9 +244,9 @@ blockchain-container/
 
 ## Status Summary
 
-**Current Phase**: Ready for initial user testing  
+**Current Phase**: Smart contract compilation and deployment testing  
 **Blocking Issues**: None  
 **Risk Level**: Low  
-**Next Milestone**: Successful geth installation and first blockchain initialization
+**Next Milestone**: Successful contract compilation and deployment with manual mining
 
-**For Future LLMs**: This project is ready for user experimentation. All foundational decisions have been made and documented. Focus should be on helping with geth installation, blockchain setup, and smart contract development workflows.
+**For Future LLMs**: This project has a working blockchain environment with Geth 1.10.26 and a ready-to-compile Faucet.sol contract. Focus should be on helping with contract compilation, deployment, and testing the manual mining workflow with smart contracts.

@@ -79,6 +79,14 @@ This document records key decisions made during project development, including r
 - Full host volume mount for all data
 **Impact**: Development files edited on Mac in `./workspace`, mounted to `/workspace` in container
 
+### D012: File-First Development Workflow (2025-07-06)
+**Decision**: Create files on Mac first, then restart container to use them
+**Rationale**: User prefers creating files outside container, then using them inside clean environment
+**Alternatives Considered**: 
+- Direct file creation in container via SSH
+- Real-time file sync during container operation
+**Impact**: Workflow: create files on Mac → restart container → SSH to use files
+
 ### D013: Zero Address Faucet Experiment (2025-07-06)
 **Decision**: Zero address funding approach does not work for faucet functionality
 **Rationale**: Experimental testing proved that genesis-allocated funds at zero address cannot be transferred
@@ -87,6 +95,15 @@ This document records key decisions made during project development, including r
 - Proper test address with known private key
 - Smart contract faucet
 **Impact**: Must use proper address with private key for faucet functionality
+
+### D014: Geth Version for PoW Support (2025-07-06)
+**Decision**: Use Geth 1.10.26 for Proof of Work mining capability
+**Rationale**: Modern Geth versions (1.13+) only support PoS post-merge, need pre-merge version for PoW
+**Alternatives Considered**: 
+- Geth 1.15.11 (latest - PoS only)
+- Geth 1.13.15 (post-merge - PoS only)
+- Switch to PoS consensus (more complex setup)
+**Impact**: Must use older Geth version, affects available features and future upgrade path
 
 ### D015: Smart Contract Faucet Architecture (2025-07-06)
 **Decision**: Implement smart contract faucet with unlimited function for private blockchain
@@ -109,11 +126,24 @@ This document records key decisions made during project development, including r
 **Decision**: Unlimited faucet with custom amount function for private blockchain experimentation
 **Rationale**: Private network allows unrestricted access, focus on learning over rate limiting
 **Features Decided**:
-- Custom amount withdrawal function: `gimmeETH(uint256 amount)`
+- Custom amount withdrawal function: `getETH(uint256 amount)`
 - No cooldowns, no limits, no tracking (private network)
 - Contract refillable via direct ETH transfers
 - Genesis allocation directly to contract address
 **Impact**: Simple contract structure, focus on deployment/interaction learning
+
+### D018: Simplified Faucet Contract Design (2025-07-06)
+**Decision**: Remove convenience functions, use single getETH(uint256 amount) function only
+**Rationale**: Compilation issues with decimal literals (0.01 ether) and complex convenience functions
+**Problem Encountered**: 
+- DeclarationError with decimal literals like `0.01 ether`
+- Misleading error messages ("undeclared identifier" vs "invalid literal")
+- Solidity doesn't support decimal expressions in function calls
+**Solution Applied**: 
+- Single main function: getETH(uint256 amount)
+- Use web3.toWei() in geth console for user convenience
+- Cleaner, more maintainable contract structure
+**Impact**: Simpler compilation, easier debugging, web3-based user experience
 
 ## User Preferences Established
 
@@ -138,6 +168,7 @@ This document records key decisions made during project development, including r
 - Understanding each step rather than black-box solutions
 - Experimentation and iteration over production-ready setup
 - Educational value prioritized over convenience
+- Simpler designs preferred over complex convenience features
 
 ## Rejected Alternatives
 
@@ -152,3 +183,7 @@ This document records key decisions made during project development, including r
 - **Docker exec access**: User specifically requested SSH capability
 - **Single documentation file**: User agreed separate files better for organization
 - **All-container editing**: Too slow for development workflow
+- **Zero address faucet**: Experimental testing proved it doesn't work
+- **Modern Geth versions**: Don't support PoW mining needed for manual control
+- **Remix IDE compilation**: External dependency not fitting file-first workflow
+- **Complex convenience functions**: Compilation issues with decimal literals, simpler is better

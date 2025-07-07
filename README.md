@@ -43,8 +43,14 @@ blockchain-container/
 ├── DECISIONS.md        (Architecture decisions and rationale)
 ├── PROGRESS.md         (Project timeline and status)
 ├── QUICKSTART.md       (Essential commands only)
+├── EXPERIMENTAL_FINDINGS.md (Technical discoveries)
+├── SMART_CONTRACT_PLAN.md   (Implementation roadmap)
 └── workspace/          (Development files - edit on Mac, sync to container)
-    └── .gitkeep        (Keeps empty folder in git)
+    ├── .gitkeep        (Keeps empty folder in git)
+    ├── contracts/
+    │   └── Faucet.sol  (Smart contract source)
+    ├── genesis.json    (Blockchain configuration)
+    └── setup.sh        (Container setup script)
 ```
 
 **Note**: DECISIONS.md and PROGRESS.md contain critical context for future LLM conversations.
@@ -58,9 +64,10 @@ cd blockchain-container
 2. **Create workspace folder:**
 ```bash
 mkdir workspace
+mkdir workspace/contracts
 ```
 
-3. **Save the Dockerfile and docker-compose.yml** from the artifacts above
+3. **Save all the files** from the artifacts (Dockerfile, docker-compose.yml, and all .md files)
 
 4. **Build and start container:**
 ```bash
@@ -87,7 +94,7 @@ You now have a clean Alpine Linux environment ready for your blockchain experime
 - Workspace directory: `/workspace` (mounted from your Mac's `./workspace` folder)
 
 **What's NOT included (install as needed):**
-- Geth (install manually)
+- Geth (install manually using setup.sh script)
 - Smart contract development tools
 - Additional development packages
 
@@ -95,6 +102,23 @@ You now have a clean Alpine Linux environment ready for your blockchain experime
 - Edit files on your Mac in the `workspace/` folder (fast)
 - Files automatically appear in `/workspace` inside the container
 - Use container for running geth and blockchain commands
+
+### Getting Started Workflow
+1. **Run setup script** (installs Geth 1.10.26 with PoW support):
+   ```bash
+   /workspace/setup.sh
+   ```
+
+2. **Initialize blockchain**:
+   ```bash
+   cd /workspace
+   geth --datadir /blockchain/mychain init genesis.json
+   ```
+
+3. **Start geth console**:
+   ```bash
+   geth --datadir /blockchain/mychain --networkid 1337 --http --http.port 8545 --http.addr 0.0.0.0 --http.api "eth,net,web3,personal,miner" --allow-insecure-unlock console
+   ```
 
 ### Why Manual Block Creation?
 Manual block creation is perfect for blockchain experimentation because:
@@ -135,6 +159,58 @@ eth.blockNumber
 
 // See transaction count in mempool
 eth.getBlockTransactionCount("pending")
+```
+
+## Smart Contract Development
+
+### Faucet Contract
+The workspace includes a ready-to-deploy Faucet.sol contract:
+
+```solidity
+contract Faucet {
+    function getETH(uint256 amount) external {
+        require(address(this).balance >= amount, "Insufficient funds");
+        payable(msg.sender).transfer(amount);
+        emit Withdrawal(msg.sender, amount);
+    }
+    
+    receive() external payable {
+        emit Deposit(msg.sender, msg.value);
+    }
+    
+    function getBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
+}
+```
+
+### Compilation Workflow
+```bash
+# Install Solidity compiler
+apk add solidity
+
+# Create ABI directory
+mkdir -p /workspace/abi
+
+# Compile contract
+solc --bin --abi /workspace/contracts/Faucet.sol -o /workspace/abi/
+
+# Check output
+ls /workspace/abi/
+```
+
+### Contract Usage Examples
+```javascript
+// In geth console - withdraw different amounts
+faucet.getETH(web3.toWei(0.01, "ether"))  // 0.01 ETH
+faucet.getETH(web3.toWei(1, "ether"))     // 1 ETH
+faucet.getETH(web3.toWei(100, "ether"))   // 100 ETH
+
+// Check contract balance
+faucet.getBalance()
+
+// Refill contract
+eth.sendTransaction({to: contractAddress, value: web3.toWei(1000, "ether")})
 ```
 
 ## Adding Ports Later (When Needed)
@@ -181,6 +257,35 @@ docker compose build --no-cache
 5. **Manual block creation is core requirement** - for precise smart contract testing workflow
 6. **Data stays in container** - no host volume mounts for simplicity
 7. **Ports added as needed** - start with just SSH, expand later
+8. **File-first workflow** - create files on Mac, restart container, SSH to use files
+9. **Smart contracts ready** - Faucet.sol contract designed and ready for deployment
+10. **Geth 1.10.26** - pre-merge version required for PoW manual mining
+
+### CRITICAL: File Update Protocol for Future LLMs
+**MANDATORY REQUIREMENT**: When updating ANY file, you MUST provide the COMPLETE file content with the correct filename header.
+
+**What NOT to do:**
+```
+# ❌ WRONG - Partial updates like this:
+artifacts.update(old_str="...", new_str="...")
+```
+
+**What TO do:**
+```
+# ✅ CORRECT - Complete file with filename:
+artifacts.create(
+  title="FILENAME.md - Complete Updated File", 
+  content="[ENTIRE FILE CONTENT]"
+)
+```
+
+**User's Explicit Requirement**: 
+- "when you need to update, you have to give me full file with with file name not like this!!!!!"
+- User requires seeing complete files, not partial updates
+- Always specify the exact filename for each complete file
+- This applies to ALL files: .md, .sol, .json, .sh, .yml, etc.
+
+**Rationale**: User needs to see complete context and save files properly on their Mac system.
 
 ### Discussion Points That Were Resolved:
 - Base image: Alpine chosen over Ubuntu/Debian for size
@@ -191,6 +296,14 @@ docker compose build --no-cache
 - Port exposure: Minimal initially, expand as required
 - Data persistence: In-container storage chosen over host mounts
 - Workflow: Foreground + new terminal chosen over background daemon
+- Faucet approach: Smart contract chosen over genesis pre-funding
+- Contract design: Simplified single function over complex convenience functions
+
+### Experimental Findings:
+- **Zero address faucet doesn't work** - genesis allocation ≠ spendable account
+- **Modern Geth versions only support PoS** - must use v1.10.26 for PoW
+- **Solidity decimal literals cause issues** - use explicit wei values or web3.toWei()
+- **Simple contract designs more reliable** - avoid complex convenience functions
 
 ### Future Expansion Options:
 - Add more ports in docker-compose.yml for external tool connections

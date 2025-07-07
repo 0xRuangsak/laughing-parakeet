@@ -7,27 +7,56 @@ This document outlines the implementation roadmap for smart contract faucet deve
 ### Core Functionality
 ```solidity
 contract Faucet {
-    // Unlimited withdrawal for private blockchain
-    function gimmeETH(uint256 amount) external {
-        require(address(this).balance >= amount, "Insufficient funds");
+    // Event for tracking withdrawals and deposits
+    event Withdrawal(address indexed to, uint256 amount);
+    event Deposit(address indexed from, uint256 amount);
+    
+    // Main withdrawal function - unlimited for private blockchain
+    function getETH(uint256 amount) external {
+        require(address(this).balance >= amount, "Insufficient funds in faucet");
         payable(msg.sender).transfer(amount);
+        emit Withdrawal(msg.sender, amount);
     }
     
     // Accept ETH deposits for refilling
-    receive() external payable {}
+    receive() external payable {
+        emit Deposit(msg.sender, msg.value);
+    }
     
-    // Check contract balance
+    // Check contract balance functions
     function getBalance() external view returns (uint256) {
         return address(this).balance;
+    }
+    
+    function getBalanceInETH() external view returns (uint256) {
+        return address(this).balance / 1 ether;
     }
 }
 ```
 
 ### Design Principles
+- **Single Withdrawal Function**: getETH(uint256 amount) for any amount needed
+- **No Convenience Functions**: Simplified design to avoid compilation issues  
+- **Web3 Integration**: Use web3.toWei() in geth console for user-friendly amounts
 - **No Access Controls**: Private blockchain, single user environment
 - **No Rate Limiting**: Unlimited withdrawals for experimentation
-- **Simple Interface**: Focus on deployment and interaction learning
+- **Event Logging**: Track all withdrawals and deposits
 - **Refillable**: Accept ETH transfers for continuous operation
+
+### Usage Examples
+```javascript
+// In geth console - withdraw different amounts
+faucet.getETH(web3.toWei(0.01, "ether"))  // 0.01 ETH
+faucet.getETH(web3.toWei(1, "ether"))     // 1 ETH
+faucet.getETH(web3.toWei(100, "ether"))   // 100 ETH
+
+// Check balances
+faucet.getBalance()     // Returns wei
+faucet.getBalanceInETH() // Returns ETH units
+
+// Refill faucet
+eth.sendTransaction({to: contractAddress, value: web3.toWei(1000, "ether")})
+```
 
 ## Development Workflow
 
@@ -58,7 +87,7 @@ contract Faucet {
 4. **Test Contract Functions** with manual mining
 
 ### Phase 3: Interaction Testing
-1. **Basic Withdrawal** - test gimmeETH function
+1. **Basic Withdrawal** - test getETH function
 2. **Balance Checking** - verify contract and user balances
 3. **Refill Testing** - send ETH to contract
 4. **Manual Mining Integration** - control transaction timing
@@ -88,7 +117,7 @@ contract Faucet {
 ```javascript
 // 1. Call contract function
 var faucet = eth.contract(ABI).at(CONTRACT_ADDRESS);
-faucet.gimmeETH(web3.toWei(100, "ether"));
+faucet.getETH(web3.toWei(100, "ether"));
 
 // 2. Check mempool
 eth.pendingTransactions
@@ -137,6 +166,20 @@ eth.getBalance(eth.accounts[0])
 - ✅ Contract refill working
 - ✅ Manual mining integration
 - ✅ Ready for DeFi protocols
+
+## Compilation Lessons Learned
+
+### Solidity Decimal Literal Issues
+- **Problem**: Decimal literals like `0.01 ether` cause compilation errors
+- **Error Message**: Misleading "Undeclared identifier" instead of "invalid literal"
+- **Solution**: Use explicit wei values or web3.toWei() for user convenience
+- **Best Practice**: Keep contract simple, handle user convenience in client code
+
+### Simplified Design Benefits
+- **Fewer Functions**: Reduces compilation complexity
+- **Single Responsibility**: getETH(uint256) handles all withdrawal needs
+- **Maintainable**: Easier to debug and understand
+- **Flexible**: Users can specify exact amounts needed
 
 ## Next Phase Planning
 
