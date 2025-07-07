@@ -152,12 +152,24 @@ blockchain-container/
 - Simpler contract design often more maintainable and reliable
 - Error messages in Solidity can be misleading about actual issues
 
-#### Current Status: SMART CONTRACT READY FOR COMPILATION
-- Contract design finalized ✅
-- Compilation issues resolved ✅  
-- Simplified architecture implemented ✅
-- Ready for container testing ✅
-- Next: Install solc in container and test compilation
+### 2025-07-06: Infrastructure Architecture Revision
+
+#### Tool Installation Strategy Change
+- **Problem with Manual Installation**: SSH time spent on infrastructure setup rather than learning
+- **Decision D020**: Pre-install essential blockchain tools in Dockerfile
+- **Tools Now Pre-installed**: Geth 1.10.26, Solidity compiler, gcompat package
+
+#### Container Build Enhancement
+- **Updated Dockerfile**: Includes all required blockchain infrastructure
+- **SSH Focus Changed**: Now focuses purely on blockchain operations and experimentation
+- **Instant Availability**: Tools ready immediately upon container start
+
+#### Current Status: INFRASTRUCTURE READY FOR BLOCKCHAIN EXPERIMENTATION
+- Container build includes all necessary tools ✅
+- SSH sessions focus on blockchain operations only ✅
+- Contract compilation ready immediately ✅
+- Ready for blockchain initialization and deployment ✅
+- Next: Test complete workflow from build to contract deployment
 
 ## Accomplishments
 
@@ -166,29 +178,32 @@ blockchain-container/
 - [x] Base image selected and justified (Alpine Linux)
 - [x] Access method implemented (SSH as root, no password)
 - [x] Container workflow defined (foreground + separate terminal)
-- [x] Installation strategy established (manual, learning-focused)
+- [x] Installation strategy evolved (infrastructure pre-installed, experiments manual)
 - [x] Block creation approach defined (manual mining)
 - [x] Documentation created with full context for future LLMs
 - [x] Project structure defined with separation of concerns
 - [x] Workspace mount implemented for fast development
-- [x] Geth 1.10.26 installation working (PoW support)
+- [x] Geth 1.10.26 pre-installed with PoW support
+- [x] Solidity compiler pre-installed and ready
 - [x] Zero address experiment completed (proved genesis ≠ spendable)
 - [x] Smart contract faucet architecture designed
 - [x] Solidity compilation issues identified and resolved
 - [x] Working Faucet.sol contract ready for deployment
+- [x] Infrastructure tools pre-installed in container
 
 ### 🏗️ In Progress
-- Container solidity compilation testing
-- Smart contract deployment workflow
+- Complete workflow testing (build → SSH → compile → deploy)
+- Smart contract deployment workflow validation
 - Manual mining integration with contracts
 
 ### 📋 Next Steps (User Actions Required)
-1. Restart container and SSH in
-2. Install Solidity compiler: `apk add solidity`
-3. Test contract compilation: `solc --bin --abi /workspace/contracts/Faucet.sol -o /workspace/abi/`
-4. Deploy contract to blockchain
-5. Test faucet functionality with manual mining
-6. Document deployment process
+1. Build and start container: `docker compose build && docker compose up`
+2. SSH into container: `ssh root@localhost -p 2222`
+3. Verify tools ready: `geth version && solc --version`
+4. Test contract compilation: `solc --bin --abi /workspace/contracts/Faucet.sol -o /workspace/abi/`
+5. Initialize blockchain: `geth --datadir /blockchain/mychain init /workspace/genesis.json`
+6. Deploy contract and test faucet functionality with manual mining
+7. Document complete deployment process
 
 ## Issues and Solutions
 
@@ -222,12 +237,17 @@ blockchain-container/
 **Solution**: Simplified contract design, use web3.toWei() for user convenience
 **Learning**: Solidity has limitations with decimal literals, simpler designs more reliable
 
+### Issue: Manual Tool Installation Inefficiency
+**Problem**: SSH sessions spent on infrastructure setup rather than blockchain learning
+**Solution**: Pre-install essential tools (Geth, Solidity, gcompat) in Dockerfile
+**Learning**: Separate infrastructure concerns from experimental/learning concerns
+
 ## Future Considerations
 
 ### Potential Enhancements
 - **Multi-node setup**: Create additional containers for network experimentation
 - **Port expansion**: Add geth RPC/WebSocket ports for external tool connections
-- **Development tools**: Install Node.js, Solidity compiler, web3 libraries as needed
+- **Development tools**: Install Node.js, web3 libraries for advanced development
 - **External integrations**: Connect Remix IDE, MetaMask, or custom web3 applications
 - **Monitoring tools**: Add blockchain explorers or analytics dashboards
 
@@ -239,14 +259,14 @@ blockchain-container/
 - Custom blockchain parameter tuning
 
 ### Technical Debt
-- None currently - clean minimal setup as designed
-- Future: May need to optimize for development workflow as usage patterns emerge
+- None currently - clean infrastructure-ready setup
+- Future: May need to optimize for advanced development workflows as usage expands
 
 ## Status Summary
 
-**Current Phase**: Smart contract compilation and deployment testing  
+**Current Phase**: Ready for complete workflow testing (build → compile → deploy)  
 **Blocking Issues**: None  
 **Risk Level**: Low  
-**Next Milestone**: Successful contract compilation and deployment with manual mining
+**Next Milestone**: Successful end-to-end workflow from container build to smart contract deployment
 
-**For Future LLMs**: This project has a working blockchain environment with Geth 1.10.26 and a ready-to-compile Faucet.sol contract. Focus should be on helping with contract compilation, deployment, and testing the manual mining workflow with smart contracts.
+**For Future LLMs**: This project has a working blockchain environment with pre-installed Geth 1.10.26 and Solidity compiler. Container is ready for immediate blockchain experimentation. Focus should be on helping with blockchain initialization, contract compilation, deployment, and testing the manual mining workflow with smart contracts.
