@@ -1,14 +1,13 @@
 FROM alpine:latest
 
-# Install SSH, basic tools, and blockchain development tools
+# Install SSH, basic tools, and blockchain development dependencies
 RUN apk add --no-cache \
     openssh \
     curl \
     wget \
     vim \
     nano \
-    gcompat \
-    solidity
+    gcompat
 
 # Set up SSH
 RUN ssh-keygen -A
@@ -25,9 +24,16 @@ RUN cd /tmp && \
     chmod +x /usr/local/bin/geth && \
     rm -rf /tmp/*
 
+# Download and install Solidity compiler (ARM64 version)
+RUN cd /tmp && \
+    wget https://github.com/ethereum/solidity/releases/download/v0.8.19/solc-linux-arm64 && \
+    mv solc-linux-arm64 /usr/local/bin/solc && \
+    chmod +x /usr/local/bin/solc && \
+    rm -rf /tmp/*
+
 # Verify installations
-RUN geth version
-RUN solc --version
+RUN /usr/local/bin/geth version
+RUN /usr/local/bin/solc --version
 
 # Create working directory
 WORKDIR /blockchain
